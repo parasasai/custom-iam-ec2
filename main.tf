@@ -13,6 +13,25 @@ provider "aws" {
 }
 
 # -----------------------------------------------------------------------------
+# TEMPORARY IMPORT BLOCKS (Forces Terraform to adopt the existing IAM Roles)
+# -----------------------------------------------------------------------------
+import {
+  to = aws_iam_role.sai_roles["dev"]
+  id = "ec2role-dev-Sai"
+}
+
+import {
+  to = aws_iam_role.sai_roles["QA"]
+  id = "ec2role-QA-Sai"
+}
+
+import {
+  to = aws_iam_role.sai_roles["Ops"]
+  id = "ec2role-Ops-Sai"
+}
+
+
+# -----------------------------------------------------------------------------
 # STEP 1: STATE STORE HOUSE ARCHITECTURE (S3 Remote Storage Target)
 # -----------------------------------------------------------------------------
 #resource "aws_s3_bucket" "state_bucket" {
