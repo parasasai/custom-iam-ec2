@@ -19,8 +19,8 @@ pipeline {
 
     options {
         timeout(time: 2, unit: 'HOURS')
-        ansiColor('xterm')
         disableConcurrentBuilds()
+        // Removed ansiColor('xterm') to fix the compilation error
     }
 
     stages {
