@@ -53,17 +53,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state_bucket_encr
   }
 }
 
-
-# -----------------------------------------------------------------------------
-  # S3 REMOTE STATE BACKEND CONFIGURATION
-  # -----------------------------------------------------------------------------
-  backend "s3" {
-    bucket       = "sai-devops-remote-state-bucket" # Must be pre-created in AWS
-    key          = "sai-devops/infrastructure/terraform.tfstate"
-    region       = "eu-central-1"
-    encrypt      = true
-    use_lockfile = true # Native concurrency lock avoiding deprecated parameters
-  }
 # -----------------------------------------------------------------------------
 # LOCALS & EXPRESSIONS MAPPING
 # -----------------------------------------------------------------------------
