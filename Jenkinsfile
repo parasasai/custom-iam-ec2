@@ -28,12 +28,11 @@ pipeline {
 
         stage('Execute Cycle Action Strategy') {
             steps {
-                // FIX: Universal usernamePassword strategy pulls the access key and secret key out of your exact 'aws-credentials-id' item natively
-                withCredentials([usernamePassword(
-                    credentialsId: 'aws-credentials-id', 
-                    usernameVariable: 'AWS_ACCESS_KEY_ID', 
-                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                )]) {
+                // Fixed: Native secret text credential maps completely bypass specific plugin dependencies
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     script {
                         echo 'Initializing backend plugins and connecting to the central S3 Remote State bucket...'
                         sh 'terraform init'
