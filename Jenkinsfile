@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-    // Enables a dropdown menu toggle mechanism inside the Jenkins Pipeline user interface
     parameters {
         choice(
             name: 'ACTION', 
@@ -10,17 +9,9 @@ pipeline {
         )
     }
 
-    environment {
-        // Enforces placement boundary alignment inside your selected AWS Region
-        AWS_DEFAULT_REGION = 'eu-central-1'
-        // Binds access secrets from your Jenkins Global Credentials Store
-        AWS_CREDENTIALS    = credentials('aws-credentials-id') 
-    }
-
     options {
         timeout(time: 2, unit: 'HOURS')
         disableConcurrentBuilds()
-        // Removed ansiColor('xterm') to fix the compilation error
     }
 
     stages {
@@ -31,25 +22,19 @@ pipeline {
             }
         }
 
-        stage('Terraform Init') {
+        stage('Terraform Infrastructure Management') {
             steps {
-                echo 'Initializing backend plugins and connecting to the central S3 Remote State bucket...'
-                withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_CREDENTIALS_USR}", "AWS_SECRET_ACCESS_KEY=${env.AWS_CREDENTIALS_PSW}"]) {
-                    sh 'terraform init'
-                }
-            }
-        }
-
-        stage('Execute Cycle Action Strategy') {
-            steps {
-                withEnv(["AWS_ACCESS_KEY_ID=${env.AWS_CREDENTIALS_USR}", "AWS_SECRET_ACCESS_KEY=${env.AWS_CREDENTIALS_PSW}"]) {
+                // Using the native withAWS steps wrapper pointing directly to your stored credentials ID
+                withAWS(credentials: 'aws-credentials-id', region: 'eu-central-1') {
                     script {
-                        // Structural conditional routing engine based on active user parameters
+                        echo 'Initializing backend plugins and connecting to the central S3 Remote State bucket...'
+                        sh 'terraform init'
+
                         if (params.ACTION == 'Deploy') {
                             echo '🚀 Running dry-run validation layout plan...'
                             sh 'terraform plan -out=tfplan'
                             
-                            // Safe gate mechanism requiring manual checkpoint sign-off inside the dashboard
+                            // Safe checkpoint requiring physical manual authorization inside Jenkins UI
                             input message: 'Authorize the deployment of Sai-DevOps infrastructure components?', ok: 'Apply Plan'
                             
                             echo 'Provisioning network topology, compliance IAM profiles, and compute nodes...'
@@ -58,7 +43,7 @@ pipeline {
                             echo '⚠️ Generating infrastructure destruction dry-run blueprint summary...'
                             sh 'terraform plan -destroy'
                             
-                            // Mandatory safeguard pause checkpoint prior to executing permanent cloud deletions
+                            // Safeguard pause checkpoint prior to executing permanent cloud deletions
                             input message: 'CRITICAL WARNING: Are you absolutely certain you want to PERMANENTLY DESTROY the environment?', ok: 'Confirm Destruction'
                             
                             echo '💥 Tearing down active cloud components from S3 state records...'
