@@ -11,7 +11,6 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
-backend "s3" {}
 
 # -----------------------------------------------------------------------------
 # STEP 1: STATE STORE HOUSE ARCHITECTURE (S3 Remote Storage Target)
